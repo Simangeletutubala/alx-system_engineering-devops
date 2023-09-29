@@ -1,4 +1,2 @@
 #!/bin/bash
-find . -type d -print0 | while IFS= read -r -d '' dir; do
-  chmod a+rx "$dir"
-done
+find . -type d -exec chmod a+rx {} +
