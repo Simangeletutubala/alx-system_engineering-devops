@@ -1,36 +1,31 @@
 #!/bin/bash
 
-# Check if Nginx service is running
-nginx_status=$(systemctl is-active nginx)
-if [ "$nginx_status" != "active" ]; then
+# Install Nginx if not already installed
+if ! command -v nginx &> /dev/null; then
+    sudo apt update
+    sudo apt install nginx -y
+fi
+
+# Start Nginx if not already running
+if ! ps aux | grep -q "[n]ginx"; then
     echo "Nginx is not running. Starting Nginx..."
-    sudo systemctl start nginx
+    sudo nginx
+fi
+
+# Check if Nginx is already configured to listen on port 80
+if ! grep -q "listen 80;" /etc/nginx/sites-available/default; then
+    # Add configuration to listen on port 80
+    echo "Adding 'listen 80;' to Nginx configuration..."
+    sudo sed -i 's/^\(\s*listen \)\(.*\)\(;.*\)$/\180;\2/' /etc/nginx/sites-available/default
+    
+    # Restart Nginx service to apply changes
+    sudo nginx -s reload
+fi
+
+# Check if Nginx is listening on port 80
+if ss -tln | grep ':80\b'; then
+    echo "Nginx is configured to listen on port 80."
 else
-    echo "Nginx is already running."
+    echo "Failed to configure Nginx to listen on port 80."
 fi
-
-# Check Nginx configuration
-nginx_config="/etc/nginx/nginx.conf"
-if [ -f "$nginx_config" ]; then
-    listen_config=$(grep "listen 80;" "$nginx_config")
-    if [ -z "$listen_config" ]; then
-        echo "Adding 'listen 80;' to Nginx configuration..."
-        echo "listen 80;" | sudo tee -a "$nginx_config" > /dev/null
-        sudo systemctl reload nginx
-    else
-        echo "'listen 80;' already configured in Nginx."
-    fi
-else
-    echo "Nginx configuration file not found."
-fi
-
-# Check if any process is already listening on port 80
-port_80_status=$(sudo netstat -tuln | grep ":80 ")
-if [ -n "$port_80_status" ]; then
-    echo "Port 80 is already in use by another process:"
-    echo "$port_80_status"
-    exit 1
-fi
-
-echo "Nginx is configured to listen on port 80."
 
