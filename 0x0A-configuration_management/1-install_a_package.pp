@@ -1,5 +1,5 @@
 ##!/usr/bin/pup
-# 1-install_package.pp
+# 1-install_a_package.pp
 
 # Ensure pip3 is installed
 package { 'python3-pip':
