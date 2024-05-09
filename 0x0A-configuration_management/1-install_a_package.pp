@@ -1,14 +1,8 @@
-##!/usr/bin/pup
-# 1-install_package.pp
+#!/usr/bin/pup
+# Installs flask from pip3, version 2.1.0
 
-# Ensure pip3 is installed
-package { 'python3-pip':
-  ensure => installed,
-}
-
-# Install Flask version 2.1.0 using pip3
-package { 'Flask':
+package { 'flask':
   ensure   => '2.1.0',
-  provider => 'pip3',
+  provider => 'pip3'
 }
 
