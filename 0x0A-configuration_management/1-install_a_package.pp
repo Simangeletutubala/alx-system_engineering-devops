@@ -5,7 +5,7 @@ package {'flask':
   provider => 'pip3'
 }
 
-package {'Werkzeug': 
+package {'Werkzeug':
   ensure   => '2.1.1',
   provider => 'pip3',
 }
