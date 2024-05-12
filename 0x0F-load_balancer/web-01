@@ -1,4 +1,4 @@
-erver-01 login commands
+server-01 login commands
 
 # Setting up the SSH-agent
 eval $("ssh-agent")
