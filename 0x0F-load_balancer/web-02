@@ -1,4 +1,4 @@
-erver-01 login commands
+server-01 login commands
 
 # Setting up the SSH-agent
 eval $("ssh-agent")
@@ -7,4 +7,8 @@ eval $("ssh-agent")
 ssh-add ~/.ssh/school
 
 # Username and IP Address 
-ssh ubuntu@54.86.183.207
+<<<<<<< HEAD
+ssh ubuntu@18.206.233.53
+=======
+ssh ubuntu@18.206.233.53
+>>>>>>> 26e759305d320898d99bdadefa96e81d8c05355e

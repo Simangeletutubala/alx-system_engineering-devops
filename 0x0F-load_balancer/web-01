@@ -7,4 +7,8 @@ eval $("ssh-agent")
 ssh-add ~/.ssh/school
 
 # Username and IP Address 
-ssh ubuntu@54.86.183.207
+<<<<<<< HEAD
+ssh ubuntu@107.23.101.78
+=======
+ssh ubuntu@107.23.101.78
+>>>>>>> 26e759305d320898d99bdadefa96e81d8c05355e
