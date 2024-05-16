@@ -1,37 +1,48 @@
 #!/usr/bin/env bash
-# This script installs and configures HAProxy on lb-01 server to send traffic to web-01 and web-02 servers using roundrobin algorithm.
+# Configure HAProxy to balance traffic between web-01 and web-02 using a roundrobin algorithm.
 
-# Update and install HAproxy
-sudo apt-get -y update
-sudo apt-get -y install haproxy
-
-# Backup the original HAProxy configuration file
-sudo cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.bak
-
-# Edit config file
-server_config=$(cat <<EOF
-frontend besthor_frontend
+balancer="\
+frontend haproxy_balancer
     bind *:80
     mode http
-    default_backend besthor_backend
+    default_backend webservers
+    timeout client 30s
 
-backend besthor_backend
+backend webservers
+    mode http
     balance roundrobin
     server 530884-web-01 107.23.101.78:80 check
     server 530884-web-02 18.206.233.53:80 check
-EOF
-)
+    timeout connect 10s
+    timeout server 30s
+"
 
-echo "$server_config" | sudo tee /etc/haproxy/haproxy.cfg
+# Update packages
+sudo apt-get -y update
+sudo apt-get -y upgrade
 
-# Enable haproxy to be started by init script
+# Add HAProxy PPA
+sudo apt-get -y install software-properties-common
+sudo add-apt-repository -y ppa:vbernat/haproxy-2.5
+sudo apt-get -y update
+
+# Install HAProxy
+sudo apt-get -y install haproxy
+
+# Backup original HAProxy configuration file
+sudo cp -a /etc/haproxy/haproxy.cfg{,.orig}
+
+# Update HAProxy configuration
+echo "$balancer" | sudo tee /etc/haproxy/haproxy.cfg
+
+# Enable HAProxy to start on boot
 echo "ENABLED=1" | sudo tee /etc/default/haproxy
 
-# Testing the HAproxy configuration file
+# Testing the HAProxy configuration file
 sudo haproxy -c -f /etc/haproxy/haproxy.cfg
 
-# Restart the HAProxy service
-sudo systemctl restart haproxy
+# Restart HAProxy service
+sudo service haproxy restart
 
 # Ensure the HAProxy service starts on boot
 sudo systemctl enable haproxy
