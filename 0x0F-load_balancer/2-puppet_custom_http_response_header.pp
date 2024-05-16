@@ -1,4 +1,4 @@
-nstalls a Nginx server with custome HTTP header
+# This Puppet manifest configures Nginx to include a custom HTTP response header
 
 exec {'update':
   provider => shell,
