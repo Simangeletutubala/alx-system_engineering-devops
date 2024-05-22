@@ -1,0 +1,18 @@
+defaults
+    mode http
+    timeout client 15s
+    timeout connect 10s
+    timeout server 15s
+    timeout http-request 10s
+
+frontend simangeletutubala-frontend
+    bind *:80
+    bind *:443 ssl crt /etc/haproxy/certs/www.simangeletutubala.tech.pem
+    http-request redirect scheme https  if !{ ssl_fc }
+    default_backend simangeletutubala-backend
+
+backend simangeletutubala-backend
+    http-request redirect scheme https if  !{ ssl_fc }
+    balance roundrobin
+    server 530884-web-01 54.210.119.140:80 check
+    server 530884-web-02 100.25.15.70:80 check
