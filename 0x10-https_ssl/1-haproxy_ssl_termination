@@ -1,18 +1,50 @@
+
+bal
+        log /dev/log    local0
+        log /dev/log    local1 notice
+        chroot /var/lib/haproxy
+        stats socket /run/haproxy/admin.sock mode 660 level admin
+        stats timeout 30s
+        user haproxy
+        group haproxy
+        daemon
+
+        # Default SSL material locations
+        ca-base /etc/ssl/certs
+        crt-base /etc/ssl/private
+
+        # See: https://ssl-config.mozilla.org/#server=haproxy&server-version=2.0.3&config=intermediate
+        ssl-default-bind-ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA>
+        ssl-default-bind-ciphersuites TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
+        ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets
+
 defaults
-    mode http
-    timeout client 15s
-    timeout connect 10s
-    timeout server 15s
-    timeout http-request 10s
+        log     global
+        mode    http
+        option  httplog
+        option  dontlognull
+        timeout connect 5000
+        timeout client  50000
+        timeout server  50000
+        errorfile 400 /etc/haproxy/errors/400.http
+        errorfile 403 /etc/haproxy/errors/403.http
+        errorfile 408 /etc/haproxy/errors/408.http
+        errorfile 500 /etc/haproxy/errors/500.http
+        errorfile 502 /etc/haproxy/errors/502.http
+        errorfile 503 /etc/haproxy/errors/503.http
+        errorfile 504 /etc/haproxy/errors/504.http
 
-frontend simangeletutubala-frontend
+frontend simangeletutubala_front_end
     bind *:80
-    bind *:443 ssl crt /etc/haproxy/certs/www.simangeletutubala.tech.pem
-    http-request redirect scheme https  if !{ ssl_fc }
-    default_backend simangeletutubala-backend
+    bind *:443 ssl crt /etc/letsencrypt/live/www.simangeletutubala.tech/haproxy.pem
+    http-request redirect scheme https unless { ssl_fc }
+    http-request set-header X-Forwarded-Proto https
+    default_backend simangeletutubala_back_end
 
-backend simangeletutubala-backend
-    http-request redirect scheme https if  !{ ssl_fc }
+backend simangeletutubala_back_end
     balance roundrobin
     server 530884-web-01 54.210.119.140:80 check
     server 530884-web-02 100.25.15.70:80 check
+
+backend letsencrypt-backend
+    server letsencrypt 127.0.0.1:54321
