@@ -34,16 +34,16 @@ defaults
         errorfile 504 /etc/haproxy/errors/504.http
 
 frontend simangeletutubala_front_end
-    bind *:80
-    bind *:443 ssl crt /etc/letsencrypt/live/www.simangeletutubala.tech/haproxy.pem
-    http-request redirect scheme https unless { ssl_fc }
-    http-request set-header X-Forwarded-Proto https
-    default_backend simangeletutubala_back_end
+        bind *:80
+        bind *:443 ssl crt /etc/letsencrypt/live/www.simangeletutubala.tech/haproxy.pem
+        http-request redirect scheme https unless { ssl_fc }
+        http-request set-header X-Forwarded-Proto https
+        default_backend simangeletutubala_back_end
 
 backend simangeletutubala_back_end
-    balance roundrobin
-    server 530884-web-01 54.210.119.140:80 check
-    server 530884-web-02 100.25.15.70:80 check
+        balance roundrobin
+        server 530884-web-01 54.210.119.140:80 check
+        server 530884-web-02 100.25.15.70:80 check
 
 backend letsencrypt-backend
-    server letsencrypt 127.0.0.1:54321
+        server letsencrypt 127.0.0.1:54321
