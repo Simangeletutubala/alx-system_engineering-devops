@@ -33,8 +33,8 @@ def recurse(subreddit, hot_list=[]):
         "limit": 100
     }
 
-    # Send a GET request to the subreddit's hot posts page
     try:
+        # Send a GET request to the subreddit's hot posts page
         response = requests.get(url, headers=headers, params=params, allow_redirects=False)
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
